@@ -9,7 +9,9 @@ public class CubeMovement : MonoBehaviour
     private float verticalInput;
     public List<Transform> players = new List<Transform>();
     public Transform holder;
-    private const float spaces = 0.9f;
+    private const float spaces = 1.5f;
+
+    public int currentValue = 2;
     [Header("Movement Values")]
 
     public float velocity;
@@ -46,7 +48,17 @@ public class CubeMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Cube"))
         {
-            AddPlayerToList(collision.gameObject);
+            var collisionVal = collision.gameObject.GetComponent<CubeValue>();
+            if(collisionVal.cubeValue <= currentValue)
+            {
+                currentValue += collisionVal.cubeValue;
+                AddPlayerToList(collision.gameObject);
+            }
+
+            else if(collisionVal.cubeValue > currentValue)
+            {
+                Destroy(gameObject);
+            }
         }
     }
 
@@ -63,6 +75,7 @@ public class CubeMovement : MonoBehaviour
             {
                 Transform mainTarget = i == 0 ? holder : players[i - 1].transform;
                 Vector3 pos = new Vector3(mainTarget.position.x, 0.5f, mainTarget.position.z - spaces);
+                players[i].SetParent(transform, false);
                 players[i].transform.position = Vector3.Lerp(players[i].transform.position, pos, Time.deltaTime * 5f);
                 Vector3 direction = mainTarget.transform.position - players[i].transform.position;
                 if(direction != Vector3.zero)
